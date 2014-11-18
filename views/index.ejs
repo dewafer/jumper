@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= title %></title>
+    <link rel='stylesheet' href='/stylesheets/bootstrap.min.css' />
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+	<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="http://cdn.bootcss.com/html5shiv/3.7.0/html5shiv.min.js"></script>
+        <script src="http://cdn.bootcss.com/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+	<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="/javascripts/jquery.min.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="/javascripts/bootstrap.min.js"></script>
+	<script type="text/javascript">
+		jQuery(function(){
+			var countdown;
+			$("body").keypress(function( event ){
+				if(event.which == 0){
+					if(countdown){
+						clearInterval(countdown);
+						$(".jump_notify").remove();
+					}
+				}
+			});
+			$("#jump").click(function(){
+				var url = calc_url();
+				var wait_sec = 5;
+				$(".alert").removeClass("hidden").html("<span class='jump_notify'>jump in <span class='wait_sec'>" + wait_sec + "</span>s </span>URL: <a class='show_calc_url' target='_blank'></a>");
+				$(".show_calc_url").text(url).attr("href", url);
+				countdown = setInterval(function(){
+						wait_sec--;
+						$(".wait_sec").text(wait_sec);						
+						if(wait_sec == 0){
+							clearInterval(countdown);
+							window.location = url;
+						}
+				}, 1000);
+			});
+			$("#addParams").click(function(){
+				var paramInput = $(".template").clone(true);
+				paramInput.removeClass("hidden");
+				paramInput.removeClass("template");
+				paramInput.addClass("param-input");
+				paramInput.insertBefore(".template");
+			});
+			$("#removeParamInput").click(function(){
+				$(this).parent().parent().remove();
+			});
+			$("#setRedirectKey").click(function(){
+				$(".redirect-key-input").removeClass('hidden');
+			});
+			$("#hideRedirectKeyInput").click(function(){
+				$(".redirect-key-input").addClass('hidden');
+			});
+			
+			function calc_url(){
+				var go_key = $("#go_key").val();
+				var url = window.location.href + "go";
+				if("go" != go_key.toLowerCase()){
+					url += "/" + go_key;
+				}
+				if($("#url").val()){
+					url += "?" + go_key + "=" + $("#url").val();
+				}
+				$(".param-input input").each(function(){
+					var param = $(this).val();
+					if(param){
+						if(url.indexOf("?") < 0){
+							url += "?";
+						}
+						if(url.substr(-1) != "&"){
+							url += "&";
+						}
+						url += param;
+					}
+				});
+				return url;
+			}
+		});
+	</script>
+  </head>
+  <body>
+    <h1><%= title %></h1>
+    <p>Welcome to <%= title %></p>
+
+	<div class="alert alert-success hidden"></div>
+
+<form class="form" role="form">
+  <div class="input-group">
+    <input type="input" class="form-control" id="url" placeholder="go to URL" value="">
+	<div class="input-group-btn">
+		<button type="button" class="btn btn-default" id="jump">jump!</button>
+		<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+			<span class="caret"></span>
+			<span class="sr-only">Toggle Dropdown</span>
+		</button>
+		<ul class="dropdown-menu pull-right" role="menu">
+			<li><a id="addParams" href="javascript:void(0);">Add parameters</a></li>
+			<li class="divider"></li>
+			<li><a id="setRedirectKey" href="javascript:void(0);">Define redirect parameter key</a></li>
+		</ul>
+	</div>
+  </div>
+  <div class="input-group redirect-key-input hidden">
+	<input id="go_key" type="input" class="form-control" placeholder="redirect parameter key" value="go">
+	<div class="input-group-btn">
+		<button id="hideRedirectKeyInput" type="button" class="btn btn-default">&times;</button>
+	</div>
+  </div>
+  <div class="input-group hidden template">
+	<input type="input" class="form-control" placeholder="Parameter key=value" value="">
+	<div class="input-group-btn">
+		<button id="removeParamInput" type="button" class="btn btn-default">&times;</button>
+	</div>
+  </div>
+</form>
+
+
+  </body>
+</html>
